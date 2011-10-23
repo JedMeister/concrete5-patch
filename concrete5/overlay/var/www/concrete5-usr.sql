@@ -1,0 +1,1 @@
+GRANT ALL PRIVILEGES ON concrete5.* TO 'concrete5-usr'@localhost IDENTIFIED BY 'random-password';

@@ -1,0 +1,16 @@
+#!/bin/bash -e
+# Concrete5 config file
+# Please feel free to make this better by posting on the TKL forums
+
+# set Concrete5 admin password, email and domain to serve
+# At present I can't get the set password stuff working, so have commented it out
+
+. /etc/default/inithooks
+
+[ -e $INITHOOKS_CONF ] && . $INITHOOKS_CONF
+
+# This will be the line to use once passwords are working:
+#$INITHOOKS_PATH/bin/concrete5.py --pass="$APP_PASS" --protocol="$APP_PROTOCOL" --domain="$APP_DOMAIN"
+
+# But for now:
+$INITHOOKS_PATH/bin/concrete5.py --protocol="$APP_PROTOCOL" --domain="$APP_DOMAIN"

@@ -1,0 +1,61 @@
+#!/bin/bash -ex
+
+# Concrete5 TKLPatch v0.3 by JedMeister (Jeremy Davis)
+# To be applied to TKL LAMP v11.x (tested on v11.2)
+#
+
+install()
+{
+    apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get -y \
+        -o DPkg::Options::=--force-confdef \
+        -o DPkg::Options::=--force-confold \
+        install $@
+}
+
+HOSTNAME=concrete5
+
+# set hostname
+echo "$HOSTNAME" > /etc/hostname
+sed -i "s|127.0.1.1 \(.*\)|127.0.1.1 $HOSTNAME|" /etc/hosts
+
+# install
+install php5-gd
+
+# download and unzip concrete
+cd /var/www
+wget http://sourceforge.net/projects/concretecms/files/concrete5/5.4.2.1/concrete5.4.2.1.zip
+unzip concrete5.4.2.1.zip
+rm concrete5.4.2.1.zip
+mv concrete5.4.2.1 concrete5
+
+# delete default concrete5 conf file & import base conf file - firstboot scripts complete this
+mv blanksite.php /var/www/concrete5/config/
+
+# disable default apache sites and enable concrete5 standalone
+a2dissite default
+#a2dissite default-ssl
+a2ensite concrete5-standalone
+
+# set up database
+service mysql start
+cd /var/www
+mysqladmin -u root create concrete5
+mysql -u root concrete5<concrete5-usr.sql
+mysql -u root concrete5<concrete5.sql
+rm concrete5-usr.sql
+rm concrete5.sql
+
+# change ownership and permissions of some folders
+cd /var/www/concrete5
+chown -R www-data:www-data config/ packages/ files/
+chmod 755 concrete/libraries/3rdparty/htmldiff.py
+
+# shutdown services so patch finishes cleanly
+service apache2 stop
+service mysql stop
+
+# cleanup
+apt-get clean
+
+# end
