@@ -29,7 +29,8 @@ unzip concrete5.4.2.1.zip
 rm concrete5.4.2.1.zip
 mv concrete5.4.2.1 concrete5
 
-# delete default concrete5 conf file & import base conf file - firstboot scripts complete this
+# create blank concrete5 conf file & import base conf file - firstboot scripts complete this
+touch /var/www/concrete5/config/site.php
 mv blanksite.php /var/www/concrete5/config/
 
 # disable default apache sites and enable concrete5 standalone
