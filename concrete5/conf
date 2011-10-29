@@ -20,7 +20,7 @@ echo "$HOSTNAME" > /etc/hostname
 sed -i "s|127.0.1.1 \(.*\)|127.0.1.1 $HOSTNAME|" /etc/hosts
 
 # install
-install php5-gd
+install php5-gd php-curl
 
 # download and unzip concrete
 cd /var/www
