@@ -24,10 +24,10 @@ install php5-gd php-curl
 
 # download and unzip concrete
 cd /var/www
-wget http://sourceforge.net/projects/concretecms/files/concrete5/5.4.2.1/concrete5.4.2.1.zip
-unzip concrete5.4.2.1.zip
-rm concrete5.4.2.1.zip
-mv concrete5.4.2.1 concrete5
+wget http://sourceforge.net/projects/concretecms/files/concrete5/5.4.2.2/concrete5.4.2.2.zip
+unzip concrete5.4.2.2.zip
+rm concrete5.4.2.2.zip
+mv concrete5.4.2.2 concrete5
 
 # create blank concrete5 conf file & import base conf file - firstboot scripts complete this
 touch /var/www/concrete5/config/site.php
