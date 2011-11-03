@@ -12,9 +12,16 @@ Option:
 import sys
 import getopt
 import shutil
-import hashlib
+import md5
+import random as random
+import string
 
 from dialog_wrapper import Dialog
+from mysqlconf import MySQL
+
+import os
+
+#from tempfile import mkstemp
 
 def usage(s=None):
     if s:
@@ -46,12 +53,11 @@ def main():
         elif opt == '--domain':
             domain = val
 
-# Set password part - commented out for now as I can't get this working.
-#    if not password:
-#        d = Dialog('TurnKey Linux - First boot configuration')
-#        password = d.get_password(
-#            "Concrete5 Password",
-#            "Enter new password for the Concrete5 'admin' account.")
+    if not password:
+        d = Dialog('TurnKey Linux - First boot configuration')
+        password = d.get_password(
+            "Concrete5 Password",
+            "Enter new password for the Concrete5 'admin' account.")
     
     if not protocol:
         if 'd' not in locals():
@@ -77,45 +83,57 @@ def main():
     if domain == "DEFAULT":
         domain = DEFAULT_DOMAIN
 
-# This is from TKL Magento config - doesn't work for Concrete5 - needs some jigging...
-#    hashpass = hashlib.md5("qX" + password).hexdigest() + ":qX"
+    salt = "".join(random.choice(string.letters+string.digits) for line in range(1, 65))
+#    salt = "qHlUmvrKzyMZlwBy1PQfltXGCezTrwN8Qm2uRABczMkTFBZMcm35J6jIRntPgRpS"
+    hash = md5.md5(password+':'+salt)
+    hashpass = hash.hexdigest()
+
+    m = MySQL()
+#    m.execute('UPDATE concrete5.Users SET uEmail=\"%s\" WHERE username=\"admin\";' % email)
+    m.execute('UPDATE concrete5.Users SET uPassword=\"%s\"  WHERE uName=\"admin\";' % hashpass)
 
 # Set some variables
     CONF_DIR = "/var/www/concrete5/config/"
     CONF_FILE = CONF_DIR+"site.php"
-    OLD_CONF_FILE = CONF_DIR+"oldsite.php"
+    OLD_FILE = CONF_DIR+"oldsite.php"
+    TEMP_FILE = CONF_DIR+"tempsite.php"
     BLANK_CONF_FILE = CONF_DIR+"blanksite.php"
-    URL_FILE = CONF_DIR+"baseurl.php"
-    DB_FILE = CONF_DIR+"dbpass.php"
+    URL_LINE = "define('BASE_URL', '"
+    SALT_LINE = "define('PASSWORD_SALT', '"
+    NEW_URL_LINE = URL_LINE+protocol+"://"+domain+"');"+"\n"
+    NEW_SALT_LINE = SALT_LINE+salt+"');"+"\n"
 
-# Create baseurl.php with relevant info
-    urlfile = open(URL_FILE, "w")
-    urlfile.write("define('BASE_URL', '")
-    urlfile.write(protocol)
-    urlfile.write("://")
-    urlfile.write(domain)
-    urlfile.write("');")
-    urlfile.close()
+    shutil.copy2(CONF_FILE, OLD_FILE)
 
-# Backup current site.php & replace site.php with blanksite.php
-    shutil.copy2(CONF_FILE, OLD_CONF_FILE)
-    shutil.copy2(BLANK_CONF_FILE, CONF_FILE)
+    conf = open(CONF_FILE, "r")
+    temp = open(TEMP_FILE, "w")
 
-# Create new site.php
-    urlfile = open(URL_FILE)
-    urlline = urlfile.read()
-    urlfile.close()
+    temp.write(conf.readline())
+    
+    for line in conf:
+        if not line.lstrip().startswith(URL_LINE):
+            temp.write(line)
 
-    dbfile = open(DB_FILE)
-    dbpassline = dbfile.read()
-    dbfile.close()
+    temp.write(NEW_URL_LINE)
 
-    conffile = open(CONF_FILE, "a")
-    conffile.write("\n")
-    conffile.write(dbpassline)
-    conffile.write(urlline)
-    conffile.close()
+    conf.close()
+    temp.close()
+    shutil.move(TEMP_FILE, CONF_FILE)
+
+    conf = open(CONF_FILE, "r")
+    temp = open(TEMP_FILE, "w")
+
+    temp.write(conf.readline())
+    
+    for line in conf:
+        if not line.lstrip().startswith(SALT_LINE):
+            temp.write(line)
+
+    temp.write(NEW_SALT_LINE)
+
+    conf.close()
+    temp.close()
+    shutil.move(TEMP_FILE, CONF_FILE)
 
 if __name__ == "__main__":
     main()
-
