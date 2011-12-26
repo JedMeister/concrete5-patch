@@ -14,6 +14,7 @@ install()
 }
 
 HOSTNAME=concrete5
+C5_VER=5.4.2.2
 
 # set hostname
 echo "$HOSTNAME" > /etc/hostname
@@ -24,10 +25,10 @@ install php5-gd php-curl
 
 # download and unzip concrete
 cd /var/www
-wget http://sourceforge.net/projects/concretecms/files/concrete5/5.4.2.2/concrete5.4.2.2.zip
-unzip concrete5.4.2.2.zip
-rm concrete5.4.2.2.zip
-mv concrete5.4.2.2 concrete5
+wget http://sourceforge.net/projects/concretecms/files/concrete5/$C5_VER/concrete$C5_VER.zip
+unzip concrete$C5_VER.zip
+rm concrete$C5_VER.zip
+mv concrete$C5_VER concrete5
 
 # create blank concrete5 conf file & import base conf file - firstboot scripts complete this
 touch /var/www/concrete5/config/site.php
@@ -35,7 +36,6 @@ mv blanksite.php /var/www/concrete5/config/
 
 # disable default apache sites and enable concrete5 standalone
 a2dissite default
-#a2dissite default-ssl
 a2ensite concrete5-standalone
 
 # set up database

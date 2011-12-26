@@ -2,7 +2,7 @@
 """Set Concrete5 admin password and domain to serve
 
 Option:
-    --pass=     unless provided, will ask interactively # Not working yet
+    --pass=     unless provided, will ask interactively
     --protocol= unless provided, will ask interactively
                 DEFAULT=http
     --domain=   unless provided, will ask interactively
