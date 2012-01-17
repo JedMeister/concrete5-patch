@@ -1,11 +1,10 @@
 #!/bin/bash -e
 # Concrete5 firstboot config file
 
-# set Concrete5 admin password, email and protocol/domain to serve
-#still need to do email
+# set Concrete5 admin password and email
 
 . /etc/default/inithooks
 
 [ -e $INITHOOKS_CONF ] && . $INITHOOKS_CONF
 
-$INITHOOKS_PATH/bin/concrete5.py --pass="$APP_PASS" --protocol="$APP_PROTOCOL" --domain="$APP_DOMAIN"
+$INITHOOKS_PATH/bin/concrete5.py --pass="$APP_PASS" --email="$APP_EMAIL"

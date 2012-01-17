@@ -30,9 +30,8 @@ unzip concrete$C5_VER.zip
 rm concrete$C5_VER.zip
 mv concrete$C5_VER concrete5
 
-# create blank concrete5 conf file & import base conf file - firstboot scripts complete this
-touch /var/www/concrete5/config/site.php
-mv blanksite.php /var/www/concrete5/config/
+# import blank conf file - firstboot scripts complete this
+mv site.php /var/www/concrete5/config/
 
 # disable default apache sites and enable concrete5 standalone
 a2dissite default
@@ -42,8 +41,8 @@ a2ensite concrete5-standalone
 service mysql start
 cd /var/www
 mysqladmin -u root create concrete5
-mysql -u root concrete5<concrete5-usr.sql
-mysql -u root concrete5<concrete5.sql
+mysql -u root concrete5 < concrete5-usr.sql
+mysql -u root concrete5 < concrete5.sql
 rm concrete5-usr.sql
 rm concrete5.sql
 
